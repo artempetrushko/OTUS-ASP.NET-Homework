@@ -93,7 +93,7 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPut("{id:guid}")]
-        public async Task<ActionResult> Update(Guid id, EmployeeDTO employeeDTO)
+        public async Task<ActionResult> UpdateAsync(Guid id, EmployeeDTO employeeDTO)
         {
             var employee = await _employeeRepository.GetByIdAsync(id);
             if (employee == null)
@@ -111,7 +111,7 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpDelete("{id:guid}")]
-        public async Task<ActionResult> Delete(Guid id)
+        public async Task<ActionResult> DeleteAsync(Guid id)
         {
             var wasEmployeeDeleted = await _employeeRepository.RemoveAsync(id);
             return wasEmployeeDeleted
