@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain.Administration;
 using PromoCodeFactory.WebHost.Models;
+using PromoCodeFactory.WebHost.Models.DTO;
 
 namespace PromoCodeFactory.WebHost.Controllers
 {
@@ -17,10 +18,12 @@ namespace PromoCodeFactory.WebHost.Controllers
     public class EmployeesController : ControllerBase
     {
         private readonly IRepository<Employee> _employeeRepository;
+        private readonly IRepository<Role> _roleRepository;
 
-        public EmployeesController(IRepository<Employee> employeeRepository)
+        public EmployeesController(IRepository<Employee> employeeRepository, IRepository<Role> roleRepository)
         {
             _employeeRepository = employeeRepository;
+            _roleRepository = roleRepository;
         }
 
         /// <summary>
@@ -69,6 +72,63 @@ namespace PromoCodeFactory.WebHost.Controllers
             };
 
             return employeeModel;
+        }
+
+        /// <summary>
+        /// Создать нового сотрудника
+        /// </summary>
+        /// <returns>Id нового сотрудника</returns>
+        [HttpPost]
+        public async Task<ActionResult<Guid>> CreateAsync(EmployeeDTO employeeDTO)
+        {
+            var employee = new Employee() { Id = Guid.NewGuid() };
+            await FillEmployeeInfoAsync(employee, employeeDTO);
+
+            await _employeeRepository.AddAsync(employee);
+            return Ok(employee.Id);
+        }
+
+        /// <summary>
+        /// Обновить данные сотрудника по Id
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut("{id:guid}")]
+        public async Task<ActionResult> Update(Guid id, EmployeeDTO employeeDTO)
+        {
+            var employee = await _employeeRepository.GetByIdAsync(id);
+            if (employee == null)
+            {
+                return NotFound();
+            }
+            await FillEmployeeInfoAsync(employee, employeeDTO);
+
+            await _employeeRepository.UpdateAsync(employee);
+            return Ok(null);
+        }
+
+        /// <summary>
+        /// Удалить сотрудника по Id
+        /// </summary>
+        /// <returns></returns>
+        [HttpDelete("{id:guid}")]
+        public async Task<ActionResult> Delete(Guid id)
+        {
+            var wasEmployeeDeleted = await _employeeRepository.RemoveAsync(id);
+            return wasEmployeeDeleted
+                ? Ok(null)
+                : NotFound();
+        }
+
+        private async Task FillEmployeeInfoAsync(Employee employee, EmployeeDTO employeeDTO)
+        {
+            employee.FirstName = employeeDTO.FirstName;
+            employee.LastName = employeeDTO.LastName;
+            employee.Email = employeeDTO.Email;
+            employee.AppliedPromocodesCount = employeeDTO.AppliedPromocodesCount;
+
+            var roles = await _roleRepository.GetAllAsync();
+            var employeeDTORoleIds = employeeDTO.Roles.Select(role => role.Id).ToList();
+            employee.Roles = roles.Where(role => employeeDTORoleIds.Contains(role.Id)).ToList();
         }
     }
 }
