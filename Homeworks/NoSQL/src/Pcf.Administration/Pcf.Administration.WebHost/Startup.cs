@@ -32,17 +32,13 @@ namespace Pcf.Administration.WebHost
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers().AddMvcOptions(x=> 
-                x.SuppressAsyncSuffixInActionNames = false);
+            services.AddControllers().AddMvcOptions(x => x.SuppressAsyncSuffixInActionNames = false);
+
+            services.Configure<MongoDBSettings>(Configuration.GetSection(nameof(MongoDBSettings)));
+
             services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
-            services.AddScoped<IDbInitializer, EfDbInitializer>();
-            services.AddDbContext<DataContext>(x =>
-            {
-                //x.UseSqlite("Filename=PromocodeFactoryAdministrationDb.sqlite");
-                x.UseNpgsql(Configuration.GetConnectionString("PromocodeFactoryAdministrationDb"));
-                x.UseSnakeCaseNamingConvention();
-                x.UseLazyLoadingProxies();
-            });
+            services.AddScoped<IDbInitializer, MongoDBInitializer>();
+            services.AddScoped<MongoDBContext>();
 
             services.AddOpenApiDocument(options =>
             {
