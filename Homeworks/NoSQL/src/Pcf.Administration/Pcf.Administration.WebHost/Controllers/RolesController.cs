@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Pcf.Administration.WebHost.Models;
 using Pcf.Administration.Core.Abstractions.Repositories;
 using Pcf.Administration.Core.Domain.Administration;
+using Pcf.Administration.DataAccess;
+using Pcf.Administration.DataAccess.Repositories;
 
 namespace Pcf.Administration.WebHost.Controllers
 {
@@ -17,9 +19,9 @@ namespace Pcf.Administration.WebHost.Controllers
     {
         private readonly IRepository<Role> _rolesRepository;
 
-        public RolesController(IRepository<Role> rolesRepository)
+        public RolesController(MongoDBContext mongoDBContext)
         {
-            _rolesRepository = rolesRepository;
+            _rolesRepository = new MongoRepository<Role>(mongoDBContext.Database, MongoDBSettings.ROLES_COLLECTION_NAME);
         }
         
         /// <summary>

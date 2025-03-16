@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Pcf.Administration.WebHost.Models;
 using Pcf.Administration.Core.Abstractions.Repositories;
 using Pcf.Administration.Core.Domain.Administration;
+using Pcf.Administration.DataAccess;
+using Pcf.Administration.DataAccess.Repositories;
+using Pcf.Administration.WebHost.Models;
 
 namespace Pcf.Administration.WebHost.Controllers
 {
@@ -19,9 +21,9 @@ namespace Pcf.Administration.WebHost.Controllers
     {
         private readonly IRepository<Employee> _employeeRepository;
 
-        public EmployeesController(IRepository<Employee> employeeRepository)
+        public EmployeesController(MongoDBContext mongoDBContext)
         {
-            _employeeRepository = employeeRepository;
+            _employeeRepository = new MongoRepository<Employee>(mongoDBContext.Database, MongoDBSettings.EMPLOYEES_COLLECTION_NAME);
         }
         
         /// <summary>
