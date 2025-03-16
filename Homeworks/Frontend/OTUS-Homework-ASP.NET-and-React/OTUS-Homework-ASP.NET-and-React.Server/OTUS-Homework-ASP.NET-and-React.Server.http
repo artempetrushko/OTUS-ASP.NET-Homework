@@ -1,0 +1,6 @@
+@OTUS_Homework_ASP.NET_and_React.Server_HostAddress = http://localhost:5233
+
+GET {{OTUS_Homework_ASP.NET_and_React.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
