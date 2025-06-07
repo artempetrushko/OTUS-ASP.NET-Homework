@@ -334,14 +334,6 @@ namespace Pcf.ReceivingFromPartner.WebHost.Controllers
             //в микросервис рассылки клиентам нужно либо вызвать его API, либо отправить событие в очередь
             await _givingPromoCodeToCustomerGateway.GivePromoCodeToCustomer(promoCode);
 
-            //TODO: Чтобы информация о том, что промокод был выдан парнером была отправлена
-            //в микросервис администрирования нужно либо вызвать его API, либо отправить событие в очередь
-
-            if (request.PartnerManagerId.HasValue)
-            {
-                await _administrationGateway.NotifyAdminAboutPartnerManagerPromoCode(request.PartnerManagerId.Value);
-            }
-
             return CreatedAtAction(nameof(GetPartnerPromoCodeAsync),
                 new { id = partner.Id, promoCodeId = promoCode.Id }, null);
         }
